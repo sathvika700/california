@@ -1,0 +1,10 @@
+.git
+.gitignore
+.venv
+myenv
+__pycache__
+*.py[cod]
+mlruns
+mlflow.db
+*.sqlite
+*.db

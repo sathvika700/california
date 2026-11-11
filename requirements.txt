@@ -1,0 +1,9 @@
+numpy
+scipy
+scikit-learn
+joblib
+threadpoolctl
+mlflow
+flask
+streamlit
+skops
