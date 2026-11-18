@@ -41,8 +41,32 @@ different path.
 The workflow in `.github/workflows/docker-ci.yml` runs on every push and pull
 request. It builds the Docker image, starts the container, checks the Streamlit
 health endpoint, and verifies that the bundled model returns a finite
-prediction. It does not publish the image to a registry.
+prediction. On pushes, it logs in to Docker Hub and publishes the image as
+`<your-dockerhub-username>/california-housing-ui:<commit-sha>`. Pushes to the
+repository's default branch also publish/update the `latest` tag. Pull requests
+only build and validate; they do not publish.
 
-Commit the exported `model/` bundle along with the project so the GitHub runner
-can build the image without access to the local MLflow database. The project
-`.gitignore` excludes the local virtual environment and MLflow tracking data.
+### One-time setup
+
+1. Create a Docker Hub repository named `california-housing-ui`.
+2. In Docker Hub, create an access token with permission to read and write
+   repositories.
+3. In the GitHub repository, open **Settings → Secrets and variables → Actions**
+   and add these repository secrets:
+   - `DOCKERHUB_USERNAME`: your Docker Hub username.
+   - `DOCKERHUB_TOKEN`: the Docker Hub access token (not your account password).
+4. Commit the exported `model/` bundle along with the project so the GitHub
+   runner can build without access to the local MLflow database. The project
+   `.gitignore` excludes the local virtual environment and MLflow tracking data.
+5. Push a commit to GitHub. Open the **Actions** tab to see build, validation,
+   and publish results.
+
+To download and run the published image:
+
+```powershell
+docker pull <your-dockerhub-username>/california-housing-ui:latest
+docker run --rm -p 8501:8501 <your-dockerhub-username>/california-housing-ui:latest
+```
+
+Replace the placeholder with your Docker Hub username, then open
+`http://localhost:8501`.
